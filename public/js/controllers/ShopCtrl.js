@@ -1,4 +1,4 @@
-angular.module('ShopCtrl', []).controller('ShopController', function($scope, $http, Voucher, Product, Base64) {
+angular.module('ShopCtrl', []).controller('ShopController', function($scope, $http, Voucher, Product, Campaign, Base64) {
     $scope.formData = {};
     $scope.products = {};
     $scope.cart = [];
@@ -9,6 +9,8 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
     $scope.success = false;
     var username = 'user';
     var password = 'passwd';
+    $scope.voucherError = false;
+    $scope.voucherErrorMsg = '';
 
     var encoded = Base64.encode(username + ':' + password);
     $http.defaults.headers.common.Authorization = 'Basic ' + encoded;
@@ -44,6 +46,39 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
       $scope.success = true;
     };
 
+    function showVoucherError (msg) {
+      $scope.voucherError = true;
+      $scope.voucherErrorMsg = msg;
+    };
+
+    function clearVoucherCode () {
+      $scope.formData.voucher = '';
+    };
+
+    function recalculateCart () {
+      if (!$scope.cart.length) {
+        $scope.total = 0;
+        cartCounter = 0;
+        $scope.discounts = [];
+      } else {
+        var total = 0;
+        $scope.cart.forEach(function (item) {
+          total += item.price;
+        });
+        $scope.discounts.forEach(function (discount) {
+          switch (discount.type) {
+            case "Percent" :
+              total -= (total * discount.value / 100);
+              break;
+            case "Const" :
+              total -= discount.value;
+              break;
+          }
+        });
+        $scope.total = total;
+      }
+    };
+
     $scope.addToCart = function (name, price) {
       $scope.cart.push({
         name: name,
@@ -51,49 +86,147 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
         id: cartCounter
       });
       cartCounter++;
-      $scope.total += price;
+      recalculateCart();
       $scope.success = false;
     };
 
     $scope.removeFromCart = function (id) {
       var itemToRemove = $scope.cart.filter(function (item) { return item.id === id; })[0];
       $scope.cart.splice($scope.cart.indexOf(itemToRemove), 1);
-      $scope.total -= itemToRemove.price;
+      recalculateCart();
     };
 
-    $scope.submitVoucher = function () {
-      //console.log($scope.formData);
-      if ($scope.cart.length) {
-        // add dummy voucher for now without checking
-        $scope.discounts.push({
-          value: 10,
-          type: 'EUR'
-        });
-
-        $scope.total -= 10;
-        // TO DO:
-        // verify voucher
-        // if valid - check type & apply to cart (add to discounts and calculate total price)
+    function applyVoucherToCart (voucher) {
+      // check discount type
+      var discountType = voucher.discount_type;
+      switch (voucher.discount_type) {
+        case "Percent" :
+          $scope.discounts.push({
+            value: voucher.discount,
+            type: "Percent",
+            sufix: '%',
+            voucher_id: voucher.voucher_id
+          });
+          $scope.total -= ($scope.total * voucher.discount / 100);
+          break;
+        case "Const":
+        default:
+          $scope.discounts.push({
+            value: voucher.discount,
+            type: "Const",
+            sufix: 'EUR',
+            voucher_id: voucher.voucher_id
+          });
+          $scope.total -= voucher.discount;
+          break;
       }
     };
 
-    function getVouchers() {
-      Voucher.get()
+    function compareDates (date1, date2) {
+      date1.setHours(0,0,0,0);
+      date2.setHours(0,0,0,0);
+
+      return date1.getTime() >= date2.getTime();
+    };
+
+    function validateVoucher (id) {
+      Voucher.getVoucher(id)
       .then(function (resp) {
-        $scope.vouchers = resp.data;
+        if (!resp.data.length) {
+          showVoucherError('Voucher doesn\'t exist');
+          clearVoucherCode();
+          return;
+        }
+        var voucher = resp.data[0];
+        // check number of uses
+        if (voucher.no_uses < 1) {
+          showVoucherError('Voucher already used allowed number of times');
+          clearVoucherCode();
+          return;
+        }
+        // find campaign for that voucher
+        Campaign.getCampaign(voucher.campaign_prefix)
+        .then(function (resp) {
+          if (!resp.data.length) {
+            showVoucherError('Invalid voucher');
+            clearVoucherCode();
+            return;
+          }
+          // check if campaign is active
+          var campaign = resp.data[0];
+          if (!campaign.active) {
+            showVoucherError('Invalid voucher');
+            clearVoucherCode();
+            return;
+          }
+          // check if campaign is eternal
+          if (campaign.eternal) {
+            applyVoucherToCart(voucher);
+            return;
+          }
+          // check campaign end date
+          if (!campaign.end_date) { // campaign isn't eternal but doesn't have any end date
+            showVoucherError('Invalid voucher');
+            clearVoucherCode();
+            return;
+          }
+          if (!compareDates(new Date(campaign.end_date), new Date())) {
+            showVoucherError('Invalid voucher');
+            clearVoucherCode();
+            return;
+          }
+          applyVoucherToCart(voucher);
+
+        }, function (err) {
+          console.log(err.message);
+        });
       }, function (err) {
         console.log(err.message);
       });
     };
 
-    $scope.deleteVoucher = function(id) {
-      Voucher.delete(id)
-      .then(function (resp) {
-        $scope.vouchers = resp.data;
-      }, function (err) {
-        console.log(err.message);
-      });
+    $scope.submitVoucher = function () {
+      if (!$scope.formData.voucher || !$scope.formData.voucher.length) {
+        showVoucherError('You have to submit voucher code to add it to cart');
+        clearVoucherCode();
+        return;
+      }
+      if ($scope.cart.length) {
+        // check if that voucher isn't already added to cart
+        var voucherInCart = $scope.discounts.filter(function (item) {
+          return item.voucher_id === $scope.formData.voucher;
+        });
+        if (voucherInCart.length) {
+          showVoucherError('You can\'t add the same voucher to cart twice');
+          clearVoucherCode();
+          return;
+        }
+        // if valid - apply to cart
+        validateVoucher($scope.formData.voucher);
+        clearVoucherCode();
+      } else {
+        showVoucherError('You can\'t add vouchers to an empty cart');
+        clearVoucherCode();
+      }
     };
+
+    // function getVouchers() {
+    //   Voucher.get()
+    //   .then(function (resp) {
+    //     $scope.vouchers = resp.data;
+    //   }, function (err) {
+    //     console.log(err.message);
+    //   });
+    // };
+
+    // $scope.deleteVoucher = function(id) {
+    //   Voucher.delete(id)
+    //   .then(function (resp) {
+    //     $scope.vouchers = resp.data;
+    //   }, function (err) {
+    //     console.log(err.message);
+    //   });
+    // };
 
     $scope.consumeVoucher = function () {};
 

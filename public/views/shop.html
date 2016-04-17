@@ -31,7 +31,7 @@
       <tr ng-repeat="discount in discounts" class="discountRow">
         <td>Discount</td>
         <td></td>
-        <td>- {{ discount.value }} {{ discount.type }}</td>
+        <td>- {{ discount.value }} {{ discount.sufix }}</td>
       </tr>
       </tbody>
       <tfoot>
@@ -55,3 +55,4 @@
   </div>
 </div>
 <div class="alert alert-success" role="alert" ng-show="success">{{ successMsg }}</div>
+<div class="alert alert-danger" role="alert" ng-show="voucherError">{{ voucherErrorMsg }}</div>
