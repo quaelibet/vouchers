@@ -43,6 +43,25 @@ var adminAuth = function (req, res, next) {
   };
 };
 
+var bothAuth = function (req, res, next) {
+  function unauthorized(res) {
+    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+    return res.send(401);
+  };
+
+  var user = basicAuth(req);
+
+  if (!user || !user.name || !user.pass) {
+    return unauthorized(res);
+  };
+
+  if ((user.name === 'admin' && user.pass === 'admin') || (user.name === 'user' && user.pass === 'passwd')) {
+    return next();
+  } else {
+    return unauthorized(res);
+  };
+};
+
 // // dummy 3 products creation
 // (function initProducts () {
 //   var products = Product.find(function (err, products) {
@@ -115,7 +134,7 @@ module.exports = function(app) {
   });
 
   // get campaigns
-  app.get('/api/campaigns', auth, function (req, res) {
+  app.get('/api/campaigns', bothAuth, function (req, res) {
     Campaign.find(function (err, campaigns) {
       if (err) {
         res.send(err);
@@ -142,11 +161,13 @@ module.exports = function(app) {
       prefix : req.body.prefix,
       active : req.body.active,
       eternal : req.body.eternal,
-      end_date : Date(req.body.end_date)  //'yyyy-mm-dd'
+      end_date : req.body.end_date
     }, function (err, campaign) {
       if (err) {
         res.send(err);
       }
+
+      res.json(campaign);
     });
   });
 

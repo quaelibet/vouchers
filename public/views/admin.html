@@ -3,6 +3,8 @@
     <h2 class="well">Create new campaigns &amp; vouchers</h2>
   </div>
 </div>
+<div class="alert alert-success" role="alert" ng-show="c_success">{{ c_successMsg }}</div>
+<div class="alert alert-danger" role="alert" ng-show="c_failure">{{ c_failureMsg }}</div>
 <div class="panel panel-default">
   <div class="panel-heading">Create new campaign</div>
   <div class="panel-body">
@@ -10,30 +12,30 @@
       <div class="form-group row">
         <label for="c_prefix" class="col-sm-2 form-control-label">Prefix:</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="c_prefix" name="prefix" placeholder="XSWEDC">
+          <input type="text" class="form-control" id="c_prefix" name="prefix" placeholder="XSWEDC" ng-model="campaignData.prefix">
         </div>
       </div>
       <div class="form-group row">
         <label for="c_active" class="col-sm-2 form-control-label">Active:</label>
         <div class="col-sm-10 form-inline">
-            <input type="checkbox" id="c_active" name="active" checked="checked">
+            <input type="checkbox" id="c_active" name="active" ng-model="campaignData.active">
         </div>
       </div>
       <div class="form-group row">
         <label for="c_end" class="col-sm-2 form-control-label">End date:</label>
         <div class="col-sm-10">
-          <input type="date" class="form-control" id="c_end" name="end_date" placeholder="">
+          <input type="date" class="form-control" id="c_end" name="end_date" placeholder="" ng-model="campaignData.end_date">
         </div>
       </div>
       <div class="form-group row">
         <label for="c_eternal" class="col-sm-2 form-control-label">Eternal:</label>
         <div class="col-sm-10 form-inline">
-            <input type="checkbox" id="c_eternal" name="eternal" checked="checked">
+            <input type="checkbox" id="c_eternal" name="eternal" checked="checked"  ng-model="campaignData.eternal">
         </div>
       </div>
       <div class="form-group row">
         <div class="col-sm-12">
-          <button type="submit" class="btn btn-secondary pull-right">Create</button>
+          <button type="submit" class="btn btn-secondary pull-right" ng-click="createCampaign()">Create</button>
         </div>
       </div>
     </form>
