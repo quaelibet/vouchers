@@ -27,8 +27,10 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
     $scope.campaigns = [
       { prefix : '- new -' }
     ];
-    var username = 'admin';
-    var password = 'admin';
+    $scope.e_campaigns = [];
+    $scope.e_vouchers = [];
+    var username = 'user';
+    var password = 'passwd';
 
     var encoded = Base64.encode(username + ':' + password);
     $http.defaults.headers.common.Authorization = 'Basic ' + encoded;
@@ -38,7 +40,26 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
       .then(function (resp) {
         if (resp.data.length) {
           for (var i = 0; i < resp.data.length; i++) {
+            var campaign = JSON.parse(JSON.stringify(resp.data[i]));
+            if (campaign.end_date) {
+              var end_date = new Date(campaign.end_date);
+              campaign.date = end_date.getFullYear() + '-' + (end_date.getMonth() + 1) + '-' + end_date.getDate();
+            }
             $scope.campaigns.push(resp.data[i]);
+            $scope.e_campaigns.push(campaign);
+          }
+        }
+      }, function (err) {
+        console.log(err.message);
+      });
+    })();
+
+    (function getVouchers () {
+      Voucher.getVouchers()
+      .then(function (resp) {
+        if (resp.data.length) {
+          for (var i = 0; i < resp.data.length; i++) {
+            $scope.e_vouchers.push(resp.data[i]);
           }
         }
       }, function (err) {
@@ -85,6 +106,12 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
         Campaign.createCampaign($scope.campaignData)
         .then(function (resp) {
           $scope.campaigns.push(resp.data);
+          var campaign = JSON.parse(JSON.stringify(resp.data));
+          if (campaign.end_date) {
+            var end_date = new Date(campaign.end_date);
+            campaign.date = end_date.getFullYear() + '-' + (end_date.getMonth() + 1) + '-' + end_date.getDate();
+          }
+          $scope.e_campaigns.push(campaign);
           $scope.c_successMsg = "Campaign created";
           $scope.c_success = true;
           // clear form data

@@ -97,3 +97,49 @@
     </form>
   </div>
 </div>
+<div class="panel panel-info">
+  <div class="panel-heading">Existing campaigns</div>
+  <div class="panel-body">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Prefix</th>
+        <th>Active</th>
+        <th>Eternal</th>
+        <th>End Date</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="campaign in e_campaigns">
+        <td>{{ campaign.prefix }}</td>
+        <td>{{ campaign.active }}</td>
+        <td>{{ campaign.eternal }}</td>
+        <td>{{ campaign.date }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="panel panel-info">
+  <div class="panel-heading">Existing vouchers</div>
+  <div class="panel-body">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Discount</th>
+        <th>Discount type</th>
+        <th>Number of uses</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="voucher in e_vouchers">
+        <td>{{ voucher.voucher_id }}</td>
+        <td>{{ voucher.discount }}</td>
+        <td>{{ voucher.discount_type }}</td>
+        <td>{{ voucher.no_uses }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
