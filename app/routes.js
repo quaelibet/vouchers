@@ -195,10 +195,17 @@ module.exports = function(app) {
   });
   // create voucher
   app.post('/api/vouchers', adminAuth, function (req, res) {
-    var vouchersToCreate = req.body;
-    vouchersToCreate.forEach(function (voucher) {
-      voucher.voucher_id = voucher.campaign_prefix + "_" + shortid.generate();
-    });
+    var vouchersObj = req.body;
+    var vouchersToCreate = [];
+    for (var i = 0; i < vouchersObj.no_vouchers; i++) {
+      vouchersToCreate.push({
+        campaign_prefix : vouchersObj.campaign_prefix,
+        voucher_id : vouchersObj.campaign_prefix + "_" + shortid.generate(),
+        discount_type : vouchersObj.discount_type,
+        discount : vouchersObj.discount,
+        no_uses : vouchersObj.no_uses
+      });
+    }
 
     Voucher.create(vouchersToCreate,
       function (err, voucher) {

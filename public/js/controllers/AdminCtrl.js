@@ -130,12 +130,11 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
       if (!$scope.voucherData.no_vouchers) {
         $scope.voucherData.no_vouchers = 1;
       }
-
-      var vouchers = [];
-      for (var i = 0; i < $scope.voucherData.no_vouchers; i++) {
-        vouchers.push($scope.voucherData);
+      if ($scope.voucherData.no_vouchers > 10000) {
+        $scope.voucherData.no_vouchers = 10000;
       }
-      Voucher.createVouchers(vouchers)
+
+      Voucher.createVouchers($scope.voucherData)
       .then(function (resp) {
           $scope.v_successMsg = "Vouchers created";
           $scope.v_success = true;
