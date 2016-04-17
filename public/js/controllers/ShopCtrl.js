@@ -105,7 +105,8 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
             value: voucher.discount,
             type: "Percent",
             sufix: '%',
-            voucher_id: voucher.voucher_id
+            voucher_id: voucher.voucher_id,
+            no_uses: voucher.no_uses
           });
           $scope.total -= ($scope.total * voucher.discount / 100);
           break;
@@ -115,7 +116,8 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
             value: voucher.discount,
             type: "Const",
             sufix: 'EUR',
-            voucher_id: voucher.voucher_id
+            voucher_id: voucher.voucher_id,
+            no_uses: voucher.no_uses
           });
           $scope.total -= voucher.discount;
           break;
@@ -210,30 +212,29 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
       }
     };
 
-    // function getVouchers() {
-    //   Voucher.get()
-    //   .then(function (resp) {
-    //     $scope.vouchers = resp.data;
-    //   }, function (err) {
-    //     console.log(err.message);
-    //   });
-    // };
+    function consumeVoucher (voucher) {
+      // reduce voucher no_uses
+      Voucher.consumeVoucher(voucher.voucher_id, voucher.no_uses - 1)
+      .then(function (resp) {
+        voucher.no_uses--;
+      }, function (err) {
+        console.log(err.message);
+      });
+    };
 
-    // $scope.deleteVoucher = function(id) {
-    //   Voucher.delete(id)
-    //   .then(function (resp) {
-    //     $scope.vouchers = resp.data;
-    //   }, function (err) {
-    //     console.log(err.message);
-    //   });
-    // };
-
-    $scope.consumeVoucher = function () {};
+    function consumeVouchers () {
+      $scope.discounts.forEach(function (voucher) {
+        consumeVoucher(voucher);
+      });
+    };
 
     $scope.buyProducts = function () {
-      // TO DO
-      // consume voucher
-
+      // do anything only if cart is not empty
+      if (!$scope.cart.length) {
+        return;
+      }
+      // consume vouchers
+      consumeVouchers();
       // clear products from cart
       clearCart();
       // display success message

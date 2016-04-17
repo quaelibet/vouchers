@@ -15,6 +15,10 @@ angular.module('VoucherService', []).factory('Voucher', ['$http', function ($htt
 
         deleteVoucher : function (voucher_id) {
             return $http.delete('/api/vouchers/' + voucher_id);
+        },
+
+        consumeVoucher : function (voucher_id, no_uses) {
+            return $http.post('/api/voucher/' + voucher_id, angular.toJson({no_uses : no_uses}));
         }
     }
 

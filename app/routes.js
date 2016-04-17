@@ -215,6 +215,20 @@ module.exports = function(app) {
         res.json(voucher);
     });
   });
+  // consume voucher
+  app.post('/api/voucher/:voucher_id', auth, function (req, res) {
+    Voucher.update({
+      voucher_id : req.params.voucher_id
+    }, {
+      $set : { no_uses : req.body.no_uses }
+    }, function (err, voucher) {
+      if (err) {
+        res.send(err);
+      }
+      res.json(voucher);
+    });
+  });
+
   // delete voucher
   app.delete('/api/vouchers/:voucher_id', adminAuth, function (req, res) {
     Voucher.remove({
