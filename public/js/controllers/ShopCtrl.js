@@ -51,6 +51,11 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
       $scope.voucherErrorMsg = msg;
     };
 
+    function clearVoucherError () {
+      $scope.voucherError = false;
+      $scope.voucherErrorMsg = '';
+    };
+
     function clearVoucherCode () {
       $scope.formData.voucher = '';
     };
@@ -88,12 +93,14 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
       cartCounter++;
       recalculateCart();
       $scope.success = false;
+      clearVoucherError();
     };
 
     $scope.removeFromCart = function (id) {
       var itemToRemove = $scope.cart.filter(function (item) { return item.id === id; })[0];
       $scope.cart.splice($scope.cart.indexOf(itemToRemove), 1);
       recalculateCart();
+      clearVoucherError();
     };
 
     function applyVoucherToCart (voucher) {
@@ -188,6 +195,7 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
     };
 
     $scope.submitVoucher = function () {
+      clearVoucherError();
       if (!$scope.formData.voucher || !$scope.formData.voucher.length) {
         showVoucherError('You have to submit voucher code to add it to cart');
         clearVoucherCode();
@@ -239,5 +247,6 @@ angular.module('ShopCtrl', []).controller('ShopController', function($scope, $ht
       clearCart();
       // display success message
       showSuccessMsg();
+      clearVoucherError();
     };
 });
