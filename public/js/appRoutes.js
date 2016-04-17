@@ -6,8 +6,8 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
             controller: 'ShopController'
         })
         .when('/admin', {
-            templateUrl: 'views/campaigns.html',
-            controller: 'CampaignController'
+            templateUrl: 'views/admin.html',
+            controller: 'AdminController'
         });
 
     $locationProvider.html5Mode(true);

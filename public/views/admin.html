@@ -1,0 +1,95 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h2 class="well">Create new campaigns &amp; vouchers</h2>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Create new campaign</div>
+  <div class="panel-body">
+    <form>
+      <div class="form-group row">
+        <label for="c_prefix" class="col-sm-2 form-control-label">Prefix:</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="c_prefix" name="prefix" placeholder="XSWEDC">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="c_active" class="col-sm-2 form-control-label">Active:</label>
+        <div class="col-sm-10 form-inline">
+            <input type="checkbox" id="c_active" name="active" checked="checked">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="c_end" class="col-sm-2 form-control-label">End date:</label>
+        <div class="col-sm-10">
+          <input type="date" class="form-control" id="c_end" name="end_date" placeholder="">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="c_eternal" class="col-sm-2 form-control-label">Eternal:</label>
+        <div class="col-sm-10 form-inline">
+            <input type="checkbox" id="c_eternal" name="eternal" checked="checked">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-secondary pull-right">Create</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Create vouchers</div>
+  <div class="panel-body">
+    <form>
+      <div class="form-group row">
+        <label for="v_campaign" class="col-sm-2 form-control-label">Campaign:</label>
+        <div class="col-sm-10">
+          <select id="v_campaign" class="form-control" name="campaign_prefix" ng-change="checkIfNewCampaign(selectedCampaign)" ng-model="selectedCampaign" ng-options="campaign.prefix as campaign.prefix for campaign in campaigns">
+          </select>
+        </div>
+      </div>
+      <div class="form-group row" ng-show="newCampaign">
+        <label for="v_prefix" class="col-sm-2 form-control-label">Campaign Prefix:</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="v_prefix" placeholder="XSWEDC" name="new_campaign_prefix">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="v_discount" class="col-sm-2 form-control-label">Discount:</label>
+        <div class="col-sm-10">
+          <input type="number" min="1" class="form-control" id="v_discount" placeholder="" name="discount">
+        </div>
+      </div>
+      <div class="form-group row">
+        <p class="col-sm-2 form-control-label">Discount type:</p>
+        <div class="col-sm-10 form-inline">
+          <label class="radio-inline">
+            <input type="radio" name="discount_type" value="Const" checked="checked"> EUR
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="discount_type" value="Percent"> %
+          </label>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="v_no_uses" class="col-sm-2 form-control-label">Allowed number of voucher uses:</label>
+        <div class="col-sm-10">
+          <input type="number" min="1" class="form-control" id="v_no_uses" placeholder="" name="no_uses">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="v_no_vouchers" class="col-sm-2 form-control-label">Number of vouchers to create:</label>
+        <div class="col-sm-10">
+          <input type="number" min="1" class="form-control" id="v_no_vouchers" placeholder="" name="no_vouchers">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-secondary pull-right">Create</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

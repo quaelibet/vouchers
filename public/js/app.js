@@ -1,4 +1,4 @@
 angular.module(
   'equiShopApp',
-  ['ngRoute', 'appRoutes', 'ShopCtrl', 'CampaignCtrl', 'VoucherCtrl', 'ProductService', 'CampaignService', 'VoucherService', 'Base64Service']
+  ['ngRoute', 'appRoutes', 'ShopCtrl', 'AdminCtrl', 'ProductService', 'CampaignService', 'VoucherService', 'Base64Service']
 );
