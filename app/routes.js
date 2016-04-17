@@ -43,41 +43,77 @@ var adminAuth = function (req, res, next) {
   };
 };
 
-// dummy 3 products creation
-(function initProducts () {
-  var products = Product.find(function (err, products) {
-    if (err) {
-      return;
-    }
-    if (!products || !products.length) {
-      Product.create({
-        name : 'Product 1',
-        price : 100,
-        desc : 'Product 1 description',
-        img : 'saddle1.jpg'
-      });
-      Product.create({
-        name : 'Product 2',
-        price : 150,
-        desc : 'Product 2 description',
-        img : 'saddle2.jpg'
-      });
-      Product.create({
-        name : 'Product 3',
-        price : 300,
-        desc : 'Product 3 description'
-      });
-    }
-  });
-})();
+// // dummy 3 products creation
+// (function initProducts () {
+//   var products = Product.find(function (err, products) {
+//     if (err) {
+//       return;
+//     }
+//     if (!products || !products.length) {
+//       Product.create({
+//         name : 'Product 1',
+//         price : 100,
+//         desc : 'Product 1 description',
+//         img : 'saddle1.jpg'
+//       });
+//       Product.create({
+//         name : 'Product 2',
+//         price : 150,
+//         desc : 'Product 2 description',
+//         img : 'saddle2.jpg'
+//       });
+//       Product.create({
+//         name : 'Product 3',
+//         price : 300,
+//         desc : 'Product 3 description'
+//       });
+//     }
+//   });
+// })();
 
 module.exports = function(app) {
-  // front-end routes
-  app.get('*', function(req, res) {
-      res.sendFile('index.html', { root : __dirname + '/../public/views' }); // load our public/index.html file
-  });
+
 
   // API routes
+  // get products
+  app.get('/api/products', auth, function (req, res) {
+    Product.find(function (err, products) {
+      if (err) {
+        res.send(err);
+      }
+
+      res.json(products);
+    });
+  });
+  // create products
+  app.post('/api/products', auth, function (req, res) {
+    Product.create({
+      name : 'Product 1',
+      price : 100,
+      desc : 'Product 1 description',
+      img : 'saddle1.jpg'
+    }, {
+      name : 'Product 2',
+      price : 150,
+      desc : 'Product 2 description',
+      img : 'saddle2.jpg'
+    }, {
+      name : 'Product 3',
+      price : 300,
+      desc : 'Product 3 description'
+    }, function (err) {
+      if (err) {
+        res.send(err);
+      }
+      Product.find(function (err, products) {
+        if (err) {
+          res.send(err);
+        }
+        res.json(products);
+      });
+    });
+  });
+
   // get campaigns
   app.get('/api/campaigns', auth, function (req, res) {
     Campaign.find(function (err, campaigns) {
@@ -160,5 +196,10 @@ module.exports = function(app) {
         }
         res.send("success");
     });
+  });
+
+  // front-end routes
+  app.get('*', function(req, res) {
+      res.sendFile('index.html', { root : __dirname + '/../public/views' }); // load our public/index.html file
   });
 }
