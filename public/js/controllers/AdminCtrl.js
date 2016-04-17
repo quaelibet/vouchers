@@ -29,8 +29,8 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
     ];
     $scope.e_campaigns = [];
     $scope.e_vouchers = [];
-    var username = 'user';
-    var password = 'passwd';
+    var username = 'admin';
+    var password = 'admin';
 
     var encoded = Base64.encode(username + ':' + password);
     $http.defaults.headers.common.Authorization = 'Basic ' + encoded;
@@ -165,6 +165,9 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
       .then(function (resp) {
           $scope.v_successMsg = "Vouchers created";
           $scope.v_success = true;
+          for (var i = 0; i < resp.data.length; i++) {
+            $scope.e_vouchers.push(resp.data[i]);
+          }
           // clear form data
           clearVoucherFormData();
         }, function (err) {

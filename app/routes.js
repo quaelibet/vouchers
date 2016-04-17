@@ -24,6 +24,44 @@ var auth = function (req, res, next) {
   };
 };
 
+var adminAuth = function (req, res, next) {
+  function unauthorized(res) {
+    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+    return res.send(401);
+  };
+
+  var user = basicAuth(req);
+
+  if (!user || !user.name || !user.pass) {
+    return unauthorized(res);
+  };
+
+  if (user.name === 'admin' && user.pass === 'admin') {
+    return next();
+  } else {
+    return unauthorized(res);
+  };
+};
+
+var bothAuth = function (req, res, next) {
+  function unauthorized(res) {
+    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+    return res.send(401);
+  };
+
+  var user = basicAuth(req);
+
+  if (!user || !user.name || !user.pass) {
+    return unauthorized(res);
+  };
+
+  if ((user.name === 'admin' && user.pass === 'admin') || (user.name === 'user' && user.pass === 'passwd')) {
+    return next();
+  } else {
+    return unauthorized(res);
+  };
+};
+
 module.exports = function(app) {
   // API routes
   // get products
@@ -66,7 +104,7 @@ module.exports = function(app) {
   });
 
   // get campaigns
-  app.get('/api/campaigns', auth, function (req, res) {
+  app.get('/api/campaigns', bothAuth, function (req, res) {
     Campaign.find(function (err, campaigns) {
       if (err) {
         res.send(err);
@@ -88,7 +126,7 @@ module.exports = function(app) {
     });
   });
   // create campaign
-  app.post('/api/campaigns', auth, function (req, res) {
+  app.post('/api/campaigns', adminAuth, function (req, res) {
     Campaign.create({
       prefix : req.body.prefix,
       active : req.body.active,
@@ -104,7 +142,7 @@ module.exports = function(app) {
   });
 
   // get vouchers
-  app.get('/api/vouchers', auth, function (req, res) {
+  app.get('/api/vouchers', bothAuth, function (req, res) {
     Voucher.find(function (err, vouchers) {
       if (err) {
         res.send(err);
@@ -126,7 +164,7 @@ module.exports = function(app) {
     });
   });
   // create voucher
-  app.post('/api/vouchers', auth, function (req, res) {
+  app.post('/api/vouchers', adminAuth, function (req, res) {
     var vouchersObj = req.body;
     var vouchersToCreate = [];
     for (var i = 0; i < vouchersObj.no_vouchers; i++) {
@@ -162,7 +200,7 @@ module.exports = function(app) {
   });
 
   // delete voucher
-  app.delete('/api/vouchers/:voucher_id', auth, function (req, res) {
+  app.delete('/api/vouchers/:voucher_id', adminAuth, function (req, res) {
     Voucher.remove({
         _id : req.params.voucher_id
     }, function (err, voucher) {
