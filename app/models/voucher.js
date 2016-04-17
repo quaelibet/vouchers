@@ -16,7 +16,7 @@ module.exports = mongoose.model('Voucher', {
     },
     discount_type : {
       type    : String,
-      default : 'Percent'
+      default : 'Const'
     },
     no_uses : {
       type    : Number,

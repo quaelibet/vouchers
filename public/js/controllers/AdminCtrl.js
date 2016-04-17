@@ -10,8 +10,20 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
     $scope.c_successMsg = "";
     $scope.c_failureMsg = "";
 
+    $scope.voucherData = {
+      selectedCampaign : '- new -',
+      campaign_prefix : '',
+      discount_type : "Const",
+      discount : 0,
+      no_uses : 1,
+      no_vouchers : 1
+    };
+    $scope.v_success = false;
+    $scope.v_failure = false;
+    $scope.v_successMsg = "";
+    $scope.v_failureMsg = "";
     $scope.newCampaign = true;
-    $scope.selectedCampaign = '- new -';
+
     $scope.campaigns = [
       { prefix : '- new -' }
     ];
@@ -47,6 +59,19 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
       $scope.c_failure = false;
       $scope.c_successMsg = "";
       $scope.c_failureMsg = "";
+      $scope.v_success = false;
+      $scope.v_failure = false;
+      $scope.v_successMsg = "";
+      $scope.v_failureMsg = "";
+    };
+
+    function clearCampaignFormData () {
+      $scope.campaignData = {
+        active : true,
+        eternal : true,
+        prefix : '',
+        end_date: null
+      };
     };
 
     $scope.createCampaign = function () {
@@ -63,15 +88,61 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope, $
           $scope.c_successMsg = "Campaign created";
           $scope.c_success = true;
           // clear form data
-          $scope.campaignData = {
-            active : true,
-            eternal : true,
-            prefix : '',
-            end_date: null
-          };
+          clearCampaignFormData();
         }, function (err) {
           console.log(err.message);
         });
       }
+    };
+
+    function clearVoucherFormData () {
+      $scope.voucherData = {
+        selectedCampaign : '- new -',
+        campaign_prefix : '',
+        discount_type : "Const",
+        discount : 0,
+        no_uses : 1,
+        no_vouchers : 1
+      };
+      $scope.newCampaign = true;
+    };
+
+    $scope.createVouchers = function () {
+      clearMessages();
+      // if new campaign - check if prefix filled
+      if ($scope.voucherData.selectedCampaign === '- new -') {
+        if (!$scope.voucherData.campaign_prefix || !$scope.voucherData.campaign_prefix.length) {
+          $scope.v_failureMsg = "Voucher not created. You need to submit prefix for new campaign!"
+          $scope.v_failure = true;
+          return;
+        }
+      } else {
+        // set campaign prefix
+        $scope.voucherData.campaign_prefix = $scope.voucherData.selectedCampaign;
+      }
+      // check if number of vouchers to create filled
+      if (($scope.voucherData.discount === null) || ($scope.voucherData.discount === undefined)) {
+        $scope.voucherData.discount = 0;
+      }
+      if (!$scope.voucherData.no_uses) {
+        $scope.voucherData.no_uses = 1;
+      }
+      if (!$scope.voucherData.no_vouchers) {
+        $scope.voucherData.no_vouchers = 1;
+      }
+
+      var vouchers = [];
+      for (var i = 0; i < $scope.voucherData.no_vouchers; i++) {
+        vouchers.push($scope.voucherData);
+      }
+      Voucher.createVouchers(vouchers)
+      .then(function (resp) {
+          $scope.v_successMsg = "Vouchers created";
+          $scope.v_success = true;
+          // clear form data
+          clearVoucherFormData();
+        }, function (err) {
+          console.log(err.message);
+        });
     };
 });

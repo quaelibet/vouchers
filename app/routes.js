@@ -195,16 +195,17 @@ module.exports = function(app) {
   });
   // create voucher
   app.post('/api/vouchers', adminAuth, function (req, res) {
-    Voucher.create({
-      voucher_id : req.body.campaign_prefix + "_" + shortid.generate(),
-      campaign_prefix : req.body.campaign_prefix,
-      discount : req.body.discount,
-      discount_type : req.body.discount_type || "Percent",
-      no_uses : req.body.no_uses || 1
-    }, function (err, voucher) {
-      if (err) {
-        res.send(err);
-      }
+    var vouchersToCreate = req.body;
+    vouchersToCreate.forEach(function (voucher) {
+      voucher.voucher_id = voucher.campaign_prefix + "_" + shortid.generate();
+    });
+
+    Voucher.create(vouchersToCreate,
+      function (err, voucher) {
+        if (err) {
+          res.send(err);
+        }
+        res.json(voucher);
     });
   });
   // delete voucher

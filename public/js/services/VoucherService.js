@@ -9,8 +9,8 @@ angular.module('VoucherService', []).factory('Voucher', ['$http', function ($htt
             return $http.get('/api/vouchers/' + voucher_id);
         },
 
-        createVoucher : function (voucherData) {
-            return $http.post('/api/vouchers', voucherData);
+        createVouchers : function (voucherData) {
+            return $http.post('/api/vouchers', angular.toJson(voucherData));
         },
 
         deleteVoucher : function (voucher_id) {

@@ -41,6 +41,8 @@
     </form>
   </div>
 </div>
+<div class="alert alert-success" role="alert" ng-show="v_success">{{ v_successMsg }}</div>
+<div class="alert alert-danger" role="alert" ng-show="v_failure">{{ v_failureMsg }}</div>
 <div class="panel panel-default">
   <div class="panel-heading">Create vouchers</div>
   <div class="panel-body">
@@ -48,48 +50,48 @@
       <div class="form-group row">
         <label for="v_campaign" class="col-sm-2 form-control-label">Campaign:</label>
         <div class="col-sm-10">
-          <select id="v_campaign" class="form-control" name="campaign_prefix" ng-change="checkIfNewCampaign(selectedCampaign)" ng-model="selectedCampaign" ng-options="campaign.prefix as campaign.prefix for campaign in campaigns">
+          <select id="v_campaign" class="form-control" name="campaign_prefix" ng-change="checkIfNewCampaign(voucherData.selectedCampaign)" ng-model="voucherData.selectedCampaign" ng-options="campaign.prefix as campaign.prefix for campaign in campaigns">
           </select>
         </div>
       </div>
       <div class="form-group row" ng-show="newCampaign">
         <label for="v_prefix" class="col-sm-2 form-control-label">Campaign Prefix:</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="v_prefix" placeholder="XSWEDC" name="new_campaign_prefix">
+          <input type="text" class="form-control" id="v_prefix" placeholder="XSWEDC" name="new_campaign_prefix" ng-model="voucherData.campaign_prefix">
         </div>
       </div>
       <div class="form-group row">
         <label for="v_discount" class="col-sm-2 form-control-label">Discount:</label>
         <div class="col-sm-10">
-          <input type="number" min="1" class="form-control" id="v_discount" placeholder="" name="discount">
+          <input type="number" min="0" class="form-control" id="v_discount" placeholder="" name="discount" ng-model="voucherData.discount">
         </div>
       </div>
       <div class="form-group row">
         <p class="col-sm-2 form-control-label">Discount type:</p>
         <div class="col-sm-10 form-inline">
           <label class="radio-inline">
-            <input type="radio" name="discount_type" value="Const" checked="checked"> EUR
+            <input type="radio" name="discount_type" value="Const" ng-model="voucherData.discount_type"> EUR
           </label>
           <label class="radio-inline">
-            <input type="radio" name="discount_type" value="Percent"> %
+            <input type="radio" name="discount_type" value="Percent" ng-model="voucherData.discount_type"> %
           </label>
         </div>
       </div>
       <div class="form-group row">
         <label for="v_no_uses" class="col-sm-2 form-control-label">Allowed number of voucher uses:</label>
         <div class="col-sm-10">
-          <input type="number" min="1" class="form-control" id="v_no_uses" placeholder="" name="no_uses">
+          <input type="number" min="1" class="form-control" id="v_no_uses" placeholder="" name="no_uses" ng-model="voucherData.no_uses">
         </div>
       </div>
       <div class="form-group row">
         <label for="v_no_vouchers" class="col-sm-2 form-control-label">Number of vouchers to create:</label>
         <div class="col-sm-10">
-          <input type="number" min="1" class="form-control" id="v_no_vouchers" placeholder="" name="no_vouchers">
+          <input type="number" min="1" class="form-control" id="v_no_vouchers" placeholder="" name="no_vouchers" ng-model="voucherData.no_vouchers">
         </div>
       </div>
       <div class="form-group row">
         <div class="col-sm-12">
-          <button type="submit" class="btn btn-secondary pull-right">Create</button>
+          <button type="submit" class="btn btn-secondary pull-right" ng-click="createVouchers()">Create</button>
         </div>
       </div>
     </form>
